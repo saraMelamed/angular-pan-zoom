@@ -7,7 +7,7 @@
 angular.module('panzoom', ['monospaced.mousewheel'])
     .directive('panzoom', ['$document', 'PanZoomService',
 function ($document, PanZoomService) {
-         var api = {};
+                     var api = {};
             var viewportHeight;
             var viewportWidth;            
 
@@ -556,10 +556,6 @@ function ($document, PanZoomService) {
                             $document.on('touchend', $scope.onTouchEnd);
                             $document.on('touchmove', $scope.onTouchMove);
 
-                            return startPan($event,previousPosition);
-                        };
-
-                        function startPan($event,previousPosition){
                             if ($scope.config.panOnClickDrag) {
 
                                 lastMouseEventTime = jQuery.now();
@@ -592,7 +588,8 @@ function ($document, PanZoomService) {
 
 
                             return false;
-                        }
+                        };
+
 
                         var pan = function (delta) {
                             delta.x = delta.x || 0;
@@ -608,14 +605,6 @@ function ($document, PanZoomService) {
                                 x: $event.pageX - previousPosition.x,
                                 y: $event.pageY - previousPosition.y
                             };
-                            continuePan($event,dragDelta);
-                            previousPosition = {
-                                x: $event.pageX,
-                                y: $event.pageY
-                            };
-                        };
-
-                        function continuePan($event,dragDelta){
                             $event.preventDefault();
                             $event.stopPropagation();
 
@@ -666,23 +655,13 @@ function ($document, PanZoomService) {
                                 y: dragDelta.y / timeSinceLastMouseEvent
                             };
 
-
-                        }
-
-                        $scope.onMouseup = function ($event) {
-                            endPan();
-
-                            $document.off('mousemove', $scope.onMousemove);
-                            $document.off('mouseup', $scope.onMouseup);	
-                            $document.off('touchend', $scope.onTouchEnd);
-                            $document.off('touchmove', $scope.onTouchMove);
-
-
-                            //Set the overlay to noneblocking again:
-                            $overlay.css('display', 'none');
+                            previousPosition = {
+                                x: $event.pageX,
+                                y: $event.pageY
+                            };
                         };
 
-                        function endPan(){
+                        $scope.onMouseup = function ($event) {
                             var now = jQuery.now();
                             var timeSinceLastMouseEvent = (now - lastMouseEventTime) / 1000;
 
@@ -699,7 +678,16 @@ function ($document, PanZoomService) {
                             $scope.dragging = false;
                             $scope.model.isPanning = false;
 
-                        }
+                            $document.off('mousemove', $scope.onMousemove);
+                            $document.off('mouseup', $scope.onMouseup);	
+                            $document.off('touchend', $scope.onTouchEnd);
+                            $document.off('touchmove', $scope.onTouchMove);
+
+
+                            //Set the overlay to noneblocking again:
+                            $overlay.css('display', 'none');
+                        };
+
 
                         $scope.onMouseleave = function () {
                             $scope.onMouseup(); // same behaviour
